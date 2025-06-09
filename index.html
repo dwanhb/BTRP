@@ -29,7 +29,7 @@
             width: 100%;
             margin: 0 auto;
             padding: 4vmin;
-            height: 60%;
+            height: 100%;
             display: flex;
             flex-direction: column;
         }
@@ -185,11 +185,12 @@
         .property-card {
             width: 100%;
             max-width: min(90vw, 400px);
-            height: min(60vh, 500px);
+            height: min(70vh, 500px);
             background: rgba(255, 255, 255, 0.9);
             border-radius: 18px;
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
             padding: clamp(15px, 3vmin, 30px);
+            padding-bottom: clamp(20px, 4vmin, 40px);
             position: absolute;
             transform-origin: center;
             cursor: pointer;
@@ -237,7 +238,7 @@
         .actions {
             display: flex;
             justify-content: space-evenly;
-            margin-top: auto;
+            margin-top: clamp(10px, 2vmin, 20px);
             padding-top: clamp(10px, 2vmin, 20px);
         }
         
