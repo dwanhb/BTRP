@@ -1,0 +1,1528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BTRP - Buy The Right Property</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        body {
+            background-color: #f2f2f7;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .container {
+            max-width: 100%;
+            width: 100%;
+            margin: 0 auto;
+            padding: 4vmin;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            position: relative;
+            margin-bottom: 3vmin;
+            flex-wrap: wrap;
+            gap: 2vmin;
+        }
+        
+        .money-container {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 2vmin 3vmin;
+            border-radius: 16px;
+            box-shadow: 0 2px 14px rgba(0, 0, 0, 0.06);
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .money-label {
+            font-size: clamp(12px, 2vmin, 16px);
+            color: #8e8e93;
+            font-weight: 600;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .money {
+            font-size: clamp(18px, 3vmin, 24px);
+            font-weight: 700;
+            color: #32d74b;
+            margin-bottom: 6px;
+        }
+        
+        .negative {
+            color: #ff453a;
+        }
+        
+        .properties-count {
+            font-size: clamp(14px, 2vmin, 16px);
+            color: #8e8e93;
+            font-weight: 500;
+        }
+        
+        .time-container {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 2vmin 3vmin;
+            border-radius: 16px;
+            box-shadow: 0 2px 14px rgba(0, 0, 0, 0.06);
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            flex: 1;
+            min-width: 200px;
+            position: relative;
+        }
+        
+        .time-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        
+        .speed-button {
+            width: 40px;
+            height: 30px;
+            border-radius: 15px;
+            background-color: #ff9500;
+            color: white;
+            border: none;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            transition: all 0.2s ease;
+        }
+        
+        .speed-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .speed-button.active {
+            background-color: #ff3b30;
+        }
+        
+        .time-label {
+            font-size: clamp(12px, 2vmin, 16px);
+            color: #8e8e93;
+            font-weight: 600;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .time {
+            font-size: clamp(16px, 2.5vmin, 20px);
+            font-weight: 700;
+            color: #007aff;
+        }
+        
+        .timer-container {
+            position: relative;
+            width: 100%;
+            margin-bottom: 3vmin;
+        }
+        
+        .timer-label {
+            font-size: clamp(12px, 2vmin, 16px);
+            color: #8e8e93;
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .timer-bar {
+            height: clamp(6px, 1vmin, 10px);
+            background-color: #32d74b;
+            width: 100%;
+            border-radius: 4px;
+            transition: width 0.1s linear;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-container {
+            flex: 1;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding-top: clamp(10px, 2vmin, 30px);
+        }
+        
+        .property-card {
+            width: 100%;
+            max-width: min(90vw, 400px);
+            height: min(75vh, 500px);
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 18px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            padding: clamp(15px, 3vmin, 30px);
+            position: absolute;
+            transform-origin: center;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            overflow: auto;
+        }
+        
+        .property-card:hover {
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+        }
+        
+        .property-card h2 {
+            font-size: clamp(18px, 3vmin, 24px);
+            margin-bottom: clamp(10px, 2vmin, 20px);
+            color: #1c1c1e;
+            text-align: center;
+            font-weight: 700;
+        }
+        
+        .property-card .attribute {
+            margin: clamp(6px, 1.5vmin, 12px) 0;
+            display: flex;
+            justify-content: space-between;
+            padding: clamp(4px, 1vmin, 8px) 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .property-card .label {
+            font-weight: 600;
+            color: #8e8e93;
+            font-size: clamp(14px, 1.8vmin, 16px);
+        }
+        
+        .property-card .value {
+            font-weight: 600;
+            color: #1c1c1e;
+            font-size: clamp(14px, 1.8vmin, 16px);
+        }
+        
+        .actions {
+            display: flex;
+            justify-content: space-evenly;
+            margin-top: auto;
+            padding-top: clamp(10px, 2vmin, 20px);
+        }
+        
+        .action-button {
+            width: clamp(50px, 10vmin, 70px);
+            height: clamp(50px, 10vmin, 70px);
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: clamp(20px, 4vmin, 26px);
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+            transition: all 0.2s ease;
+        }
+        
+        .action-button:hover {
+            transform: scale(1.08);
+        }
+        
+        .action-button:active {
+            transform: scale(0.95);
+        }
+        
+        .decline {
+            background-color: #ff453a;
+            color: white;
+        }
+        
+        .purchase {
+            background-color: #32d74b;
+            color: white;
+        }
+        
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+        
+        .modal-content {
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: clamp(15px, 3vmin, 30px);
+            border-radius: 20px;
+            max-width: min(90vw, 500px);
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal h2 {
+            margin-bottom: clamp(10px, 2vmin, 20px);
+            color: #1c1c1e;
+            font-weight: 700;
+            font-size: clamp(18px, 3vmin, 24px);
+        }
+        
+        .modal p {
+            margin-bottom: clamp(8px, 1.5vmin, 15px);
+            font-size: clamp(14px, 2vmin, 17px);
+            line-height: 1.5;
+            color: #3a3a3c;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            justify-content: space-around;
+            margin-top: clamp(15px, 3vmin, 30px);
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .modal-button {
+            padding: clamp(8px, 1.5vmin, 12px) clamp(15px, 3vmin, 30px);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: clamp(14px, 2vmin, 16px);
+            font-weight: 600;
+            transition: all 0.2s ease;
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        .modal-button:hover {
+            transform: scale(1.05);
+        }
+        
+        .modal-button:active {
+            transform: scale(0.98);
+        }
+        
+        .accept {
+            background-color: #32d74b;
+            color: white;
+        }
+        
+        .reject {
+            background-color: #ff453a;
+            color: white;
+        }
+        
+        .neutral {
+            background-color: #007aff;
+            color: white;
+        }
+        
+        /* Start screen */
+        .start-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            background-color: #f2f2f7;
+        }
+        
+        .start-screen h1 {
+            font-size: 32px;
+            margin-bottom: 20px;
+            color: #1c1c1e;
+            font-weight: 700;
+        }
+        
+        .start-screen p {
+            margin-bottom: 30px;
+            font-size: 18px;
+            color: #8e8e93;
+            max-width: 80%;
+            line-height: 1.5;
+        }
+        
+        .difficulty-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 80%;
+            max-width: 300px;
+        }
+        
+        .difficulty-button {
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+        }
+        
+        .difficulty-button:hover {
+            transform: scale(1.03);
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+        }
+        
+        .difficulty-button:active {
+            transform: scale(0.98);
+        }
+        
+        .easy {
+            background-color: #32d74b;
+            color: white;
+        }
+        
+        .normal {
+            background-color: #007aff;
+            color: white;
+        }
+        
+        .hard {
+            background-color: #ff453a;
+            color: white;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .properties-owned {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-weight: bold;
+            color: #34495e;
+        }
+        
+        /* Game over screen */
+        .game-over {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            padding: 20px;
+            background-color: #f2f2f7;
+        }
+        
+        .game-over h1 {
+            font-size: 32px;
+            margin-bottom: 20px;
+            color: #1c1c1e;
+            font-weight: 700;
+        }
+        
+        .game-over p {
+            margin-bottom: 12px;
+            font-size: 17px;
+            color: #8e8e93;
+            line-height: 1.5;
+        }
+        
+        .final-stats {
+            margin: 25px 0 10px;
+            font-size: 24px;
+            font-weight: 700;
+            color: #32d74b;
+        }
+        
+        .play-again {
+            margin-top: 30px;
+            padding: 16px 36px;
+            border: none;
+            border-radius: 12px;
+            background-color: #007aff;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+        }
+        
+        .play-again:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 16px rgba(0, 123, 255, 0.4);
+        }
+        
+        .play-again:active {
+            transform: scale(0.98);
+        }
+        
+        .glossary-button {
+    margin-top: 20px;
+    padding: 14px 28px;
+    border: none;
+    border-radius: 12px;
+    background-color: #8e8e93;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.glossary-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+}
+
+    </style>
+</head>
+<body>
+    <!-- Start Screen -->
+    <div class="start-screen" id="startScreen">
+        <h1>BTRP - Buy The Right Property</h1>
+        <p>Buy and sell properties to maximize your profits! You have 10 years to build your real estate empire.</p>
+        <div class="difficulty-buttons">
+            <button class="difficulty-button easy" data-difficulty="easy">Easy ($500,000)</button>
+            <button class="difficulty-button normal" data-difficulty="normal">Normal ($200,000)</button>
+            <button class="difficulty-button hard" data-difficulty="hard">Hard ($200,000, No Cashflow)</button>
+            <button class="glossary-button" id="glossaryButton">Glossary</button>
+        </div>
+    </div>
+
+    <!-- Main Game Container -->
+    <div class="container hidden" id="gameContainer">
+        <div class="header">
+            <div class="money-container">
+                <div class="money-label">BALANCE</div>
+                <div class="money" id="money">$500,000</div>
+                <div class="properties-count" id="propertiesOwned">Properties: 0</div>
+            </div>
+            <div class="time-container">
+                <div class="time-label">CURRENT DATE</div>
+                <div class="time-controls">
+                    <div class="time" id="time">Year 01 - Month 01</div>
+                    <button class="speed-button" id="speedButton">1x</button>
+                </div>
+            </div>
+        </div>
+        <div class="timer-container">
+            <div class="timer-label">DECISION TIME REMAINING</div>
+            <div class="timer-bar" id="timerBar"></div>
+        </div>
+        
+            <div class="card-container">
+                <div class="property-card" id="propertyCard">
+                    <h2>Property Investment</h2>
+                    <div class="attribute">
+                        <span class="label">Purchase Price:</span>
+                        <span class="value" id="purchasePrice">$750,000</span>
+                    </div>
+                    <div class="attribute">
+                        <span class="label">Remaining Tenure:</span>
+                        <span class="value" id="tenure">25 years</span>
+                    </div>
+                    <div class="attribute">
+                        <span class="label">Rental Income:</span>
+                        <span class="value" id="rentalIncome">$3,500/month</span>
+                    </div>
+                    <div class="attribute">
+                        <span class="label">Rental Yield:</span>
+                        <span class="value" id="rentalYield">5.6%</span>
+                    </div>
+                    <div class="attribute" id="cashflowContainer">
+                        <span class="label">Monthly Cashflow:</span>
+                        <span class="value" id="cashflow">+$500</span>
+                    </div>
+                    <div class="attribute">
+                        <span class="label">Loan to Value:</span>
+                        <span class="value" id="ltv">80%</span>
+                    </div>
+                    <div class="attribute">
+                        <span class="label">Down Payment:</span>
+                        <span class="value" id="downPayment">$150,000</span>
+                    </div>
+                    
+                    <div class="actions">
+                        <button class="action-button decline" id="declineButton">✗</button>
+                        <button class="action-button purchase" id="purchaseButton">✓</button>
+                    </div>
+                </div>
+            </div>
+    </div>
+
+    <!-- Selling Modal -->
+    <div class="modal" id="sellModal">
+        <div class="modal-content">
+            <h2>Selling Opportunity</h2>
+            <p id="sellDescription">A buyer is interested in one of your properties!</p>
+            <div class="modal-buttons">
+                <button class="modal-button reject" id="declineSell">Decline</button>
+                <button class="modal-button accept" id="acceptSell">Sell</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Over Modal -->
+    <div class="game-over" id="gameOver">
+        <h1>10 Year Investment Cycle Complete!</h1>
+        <p>Your property investment journey has reached its conclusion.</p>
+        <p class="final-stats">Final Balance: <span id="finalBalance">$1,500,000</span></p>
+        <p>Properties Owned: <span id="finalProperties">5</span></p>
+        <p>Total Property Value: <span id="propertyValue">$3,500,000</span></p>
+        <p>Net Worth (Cash + Equity): <span id="netWorth">$5,000,000</span></p>
+        <p>Monthly Cashflow: <span id="finalCashflow">$12,500</span></p>
+        <button class="play-again" id="playAgain">Play Again</button>
+    </div>
+
+<div class="modal" id="glossaryModal">
+    <div class="modal-content">
+        <h2>Glossary</h2>
+        <p><strong>Balance:</strong> Your bank balance, used to pay for your properties. Cashflow is updated monthly as well.</p>
+        <p><strong>Decision time bar:</strong> It takes 5 seconds to deplete, indicating 1 in-game month passed.</p>
+        <p><strong>1x/2x speed toggle:</strong> Speed up the game for a bigger challenge!</p>
+        <p><strong>Purchase price:</strong> How much the property costs.</p>
+        <p><strong>Remaining tenure:</strong> How much longer you own the property after buying it. Freehold properties are yours forever (supposedly)</p>
+        <p><strong>Rental income:</strong> How much the property rents out for.</p>
+        <p><strong>Rental yield:</strong> Calculated by dividing total annual rent by the purchase price of the property. Generally, more is better.</p>
+        <p><strong>Monthly cashflow:</strong> How much excess cash there is after you deduct the mortgage from the rental income. Aim for positive cashflow, so you have assets putting money in your pocket!</p>
+        <p><strong>Loan to value:</strong> How much of the property value you can loan from the bank.</p>
+        <p><strong>Down payment:</strong> The amount of money needed to be paid to own the property after taking a loan. This is the amount deducted from your Balance.</p>
+        <div class="modal-buttons">
+            <button class="modal-button neutral" id="closeGlossary">Close</button>
+        </div>
+    </div>
+</div>
+
+
+    <script>
+        // Game state
+        const gameState = {
+            money: 500000,
+            month: 1,
+            year: 1,
+            timerSeconds: 5,
+            currentTimerValue: 5, // Track current timer value
+            difficulty: 'easy',
+            properties: [],
+            propertiesOwned: 0,
+            showCashflow: true,
+            gameActive: false
+        };
+
+        // DOM Elements
+        const startScreen = document.getElementById('startScreen');
+        const gameContainer = document.getElementById('gameContainer');
+        const moneyDisplay = document.getElementById('money');
+        const timeDisplay = document.getElementById('time');
+        const timerBar = document.getElementById('timerBar');
+        const propertyCard = document.getElementById('propertyCard');
+        const propertiesOwnedDisplay = document.getElementById('propertiesOwned');
+        const cashflowContainer = document.getElementById('cashflowContainer');
+        const speedButton = document.getElementById('speedButton');
+        
+        // Property card elements
+        const purchasePriceElement = document.getElementById('purchasePrice');
+        const tenureElement = document.getElementById('tenure');
+        const rentalIncomeElement = document.getElementById('rentalIncome');
+        const rentalYieldElement = document.getElementById('rentalYield');
+        const cashflowElement = document.getElementById('cashflow');
+        const ltvElement = document.getElementById('ltv');
+        const downPaymentElement = document.getElementById('downPayment');
+        
+        // Buttons
+        const declineButton = document.getElementById('declineButton');
+        const purchaseButton = document.getElementById('purchaseButton');
+        const difficultyButtons = document.querySelectorAll('.difficulty-button');
+        
+        // Selling modal
+        const sellModal = document.getElementById('sellModal');
+        const sellDescription = document.getElementById('sellDescription');
+        const declineSellButton = document.getElementById('declineSell');
+        const acceptSellButton = document.getElementById('acceptSell');
+        
+        // Game over screen
+        const gameOverScreen = document.getElementById('gameOver');
+        const finalBalanceElement = document.getElementById('finalBalance');
+        const finalPropertiesElement = document.getElementById('finalProperties');
+        const propertyValueElement = document.getElementById('propertyValue');
+        const netWorthElement = document.getElementById('netWorth');
+        const finalCashflowElement = document.getElementById('finalCashflow');
+        const playAgainButton = document.getElementById('playAgain');
+
+        // Timers
+        let countdownInterval;
+        
+        // Current property being displayed
+        let currentProperty = null;
+        let selectedPropertyIndex = null;
+        
+        // Helper functions
+        function formatMoney(amount) {
+            return '$' + amount.toLocaleString();
+        }
+        
+        function getRandomNumber(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+        
+        function getRandomFromArray(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+        
+        // Calculate monthly mortgage payment
+        function calculateMortgage(principal, interestRate, tenureYears) {
+            // Cap tenure at 30 years
+            const cappedTenure = Math.min(tenureYears, 30);
+            const monthlyRate = interestRate / 100 / 12;
+            const numberOfPayments = cappedTenure * 12;
+            
+            return principal * (monthlyRate * Math.pow(1 + monthlyRate, numberOfPayments)) / 
+                   (Math.pow(1 + monthlyRate, numberOfPayments) - 1);
+        }
+        
+        // Generate a random property
+        function generateProperty() {
+            const purchasePrice = getRandomNumber(500000, 1500000);
+            const isFreehold = Math.random() < 0.1; // 10% chance of freehold
+            const tenure = isFreehold ? 'Freehold' : getRandomNumber(10, 48);
+            const rentalIncome = getRandomNumber(2000, 5500);
+            
+            // Apply weighted LTV distribution:
+            // 25% chance of 50/60/70% (equally distributed among these three)
+            // 50% chance of 80% LTV
+            // 20% chance of 90% LTV
+            // 5% chance of 100% LTV
+            let ltv;
+            const ltvRandom = Math.random();
+            
+            if (ltvRandom < 0.25) {
+                // For the 25% low LTV group, evenly distribute between 50%, 60%, and 70%
+                const lowLtvOptions = [50, 60, 70];
+                ltv = lowLtvOptions[Math.floor(Math.random() * lowLtvOptions.length)];
+            } else if (ltvRandom < 0.75) {
+                ltv = 80; // 50% chance (from 0.25 to 0.75)
+            } else if (ltvRandom < 0.95) {
+                ltv = 90; // 20% chance (from 0.75 to 0.95)
+            } else {
+                ltv = 100; // 5% chance (from 0.95 to 1.0)
+            }
+            
+            const downPayment = (purchasePrice * (100 - ltv)) / 100;
+            const loanAmount = purchasePrice - downPayment;
+            
+            // Calculate rental yield
+            const rentalYield = ((rentalIncome * 12) / purchasePrice) * 100;
+            
+            // Calculate mortgage payment (monthly cashflow)
+            const mortgagePayment = calculateMortgage(loanAmount, 2.33, typeof tenure === 'string' ? 30 : tenure);
+            const cashflow = rentalIncome - mortgagePayment;
+            
+            return {
+                purchasePrice,
+                tenure,
+                rentalIncome,
+                rentalYield,
+                ltv,
+                downPayment,
+                loanAmount,
+                mortgagePayment,
+                cashflow,
+                originalPrice: purchasePrice,
+                purchaseDate: {
+                    month: gameState.month,
+                    year: gameState.year
+                }
+            };
+        }
+        
+        // Update the UI with the property data
+        function updatePropertyCard(property) {
+            purchasePriceElement.textContent = formatMoney(property.purchasePrice);
+            tenureElement.textContent = typeof property.tenure === 'string' ? property.tenure : property.tenure + ' years';
+            rentalIncomeElement.textContent = formatMoney(property.rentalIncome) + '/month';
+            rentalYieldElement.textContent = property.rentalYield.toFixed(2) + '%';
+            
+            if (gameState.showCashflow) {
+                cashflowElement.textContent = (property.cashflow >= 0 ? '+' : '') + formatMoney(property.cashflow) + '/month';
+                cashflowElement.className = 'value ' + (property.cashflow >= 0 ? '' : 'negative');
+                cashflowContainer.style.display = 'flex';
+            } else {
+                cashflowContainer.style.display = 'none';
+            }
+            
+            ltvElement.textContent = property.ltv + '%';
+            downPaymentElement.textContent = formatMoney(property.downPayment);
+        }
+        
+        // Update the timer bar
+        function updateTimerBar(percentage) {
+            timerBar.style.width = percentage + '%';
+            
+            // Change color based on time remaining
+            if (percentage > 60) {
+                timerBar.style.backgroundColor = '#2ecc71'; // Green
+            } else if (percentage > 30) {
+                timerBar.style.backgroundColor = '#f39c12'; // Orange
+            } else {
+                timerBar.style.backgroundColor = '#e74c3c'; // Red
+            }
+        }
+        
+        // Update the money display
+        function updateMoneyDisplay() {
+            moneyDisplay.textContent = formatMoney(gameState.money);
+            moneyDisplay.className = 'money ' + (gameState.money >= 0 ? '' : 'negative');
+        }
+        
+        // Update the time display
+        function updateTimeDisplay() {
+            timeDisplay.textContent = `Year ${String(gameState.year).padStart(2, '0')} - Month ${String(gameState.month).padStart(2, '0')}`;
+        }
+        
+        // Update properties owned display
+        function updatePropertiesOwnedDisplay() {
+            propertiesOwnedDisplay.textContent = `Properties: ${gameState.propertiesOwned}`;
+        }
+        
+        // Show a new property card
+        function showNewProperty() {
+            currentProperty = generateProperty();
+            updatePropertyCard(currentProperty);
+            
+            // Set initial opacity to 0 for fade-in effect
+            propertyCard.style.opacity = '0';
+            
+            // For a slight slide-in from right effect
+            propertyCard.style.transform = 'translateX(50px)';
+            
+            // Trigger reflow
+            void propertyCard.offsetWidth;
+            
+            // Animate in
+            propertyCard.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+            propertyCard.style.transform = '';
+            propertyCard.style.opacity = '1';
+            
+            // Don't restart the timer when showing a new property
+        }
+        
+        // Start the card timer (5 seconds)
+        function startCardTimer() {
+            // Clear existing interval
+            if (gameState.countdownInterval) {
+                clearInterval(gameState.countdownInterval);
+                gameState.countdownInterval = null;
+            }
+            
+            // Reset timer bar and gameState timer value
+            updateTimerBar(100);
+            gameState.currentTimerValue = gameState.timerSeconds;
+            
+            // Calculate interval based on game speed (smaller interval = faster timer)
+            const interval = 100 / gameState.gameSpeed;
+            
+            // Start new interval
+            gameState.countdownInterval = setInterval(() => {
+                // Reduce by a consistent amount each time
+                const reductionAmount = 0.1;
+                gameState.currentTimerValue -= reductionAmount;
+                
+                const percentage = (gameState.currentTimerValue / gameState.timerSeconds) * 100;
+                updateTimerBar(percentage);
+                
+                if (gameState.currentTimerValue <= 0) {
+                    // When timer naturally expires, update month and show new property
+                    if (!gameState.isModalVisible) {
+                        updateMonth();
+                        showNewProperty();
+                    }
+                    
+                    // Reset timer only when it expires naturally
+                    gameState.currentTimerValue = gameState.timerSeconds;
+                    updateTimerBar(100);
+                }
+            }, interval);
+        }
+        
+        // Purchase the current property
+        function purchaseProperty() {
+            if (!currentProperty) return;
+            
+            if (gameState.money >= currentProperty.downPayment) {
+                // Animate the card flying to the money container
+                const propertyCardRect = propertyCard.getBoundingClientRect();
+                const moneyContainerRect = moneyDisplay.getBoundingClientRect();
+                
+                // Calculate the distance to move
+                const moveX = moneyContainerRect.left - propertyCardRect.left + (moneyContainerRect.width / 2) - (propertyCardRect.width / 2);
+                const moveY = moneyContainerRect.top - propertyCardRect.top + (moneyContainerRect.height / 2) - (propertyCardRect.height / 2);
+                
+                // Apply the animation
+                propertyCard.style.transition = 'transform 0.5s ease, opacity 0.5s ease';
+                propertyCard.style.transform = `translateX(${moveX}px) translateY(${moveY}px) scale(0.1)`;
+                propertyCard.style.opacity = '0';
+                
+                // Record the purchase time to prevent immediate sell offers
+                gameState.lastPurchaseTime = Date.now();
+                
+                // Deduct down payment
+                gameState.money -= currentProperty.downPayment;
+                
+                // Add to properties owned
+                gameState.properties.push(currentProperty);
+                gameState.propertiesOwned++;
+                
+                // Update displays
+                updateMoneyDisplay();
+                updatePropertiesOwnedDisplay();
+                
+                // After animation completes, reset the card and show new property
+                setTimeout(() => {
+                    propertyCard.style.transition = 'none';
+                    propertyCard.style.transform = '';
+                    
+                    // Show new property (without resetting timer)
+                    showNewProperty();
+                    
+                    // Restore the transition
+                    setTimeout(() => {
+                        propertyCard.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+                        propertyCard.style.opacity = '1';
+                    }, 50);
+                }, 500);
+            } else {
+                // Not enough money - show a message
+                alert("You don't have enough money for the down payment!");
+            }
+        }
+        
+        // Decline the current property
+        function declineProperty() {
+            if (!currentProperty) return;
+            
+            // Animate the card flying off to the left
+            propertyCard.style.transition = 'transform 0.5s ease, opacity 0.5s ease';
+            propertyCard.style.transform = 'translateX(-200%) rotate(-30deg)';
+            propertyCard.style.opacity = '0';
+            
+            // After animation completes, reset the card and show new property
+            setTimeout(() => {
+                propertyCard.style.transition = 'none';
+                propertyCard.style.transform = '';
+                
+                // Show new property without resetting timer
+                showNewProperty();
+                
+                // Restore the transition
+                setTimeout(() => {
+                    propertyCard.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+                    propertyCard.style.opacity = '1';
+                }, 50);
+            }, 500);
+        }
+        
+        // Process monthly update
+        function updateMonth() {
+            gameState.month++;
+            
+            if (gameState.month > 12) {
+                gameState.month = 1;
+                gameState.year++;
+                
+                // Check if game is over
+                if (gameState.year > 10) {
+                    endGame();
+                    return;
+                }
+                
+                // Starting in year 4, occasionally trigger selling opportunities
+                if (gameState.year >= 4) {
+                    // Check if we should create a selling opportunity every few months
+                    // Rather than using an interval, we'll create a probability-based system
+                    gameState.sellOpportunityProbability = gameState.year >= 6 ? 0.3 : 0.15;
+                }
+            }
+            
+            // Check if we should create a random sell opportunity
+            if (gameState.year >= 4 && !gameState.sellOfferActive && gameState.properties.length > 0) {
+                // Sell opportunities have a chance to happen each month after year 4
+                // Higher chance after year 6
+                if (Math.random() < gameState.sellOpportunityProbability) {
+                    // Add cooldown check
+                    const lastPurchaseTime = gameState.lastPurchaseTime || 0;
+                    const currentTime = Date.now();
+                    const timeSinceLastPurchase = currentTime - lastPurchaseTime;
+                    
+                    // Only create opportunity if it's been at least 10 seconds since last purchase
+                    if (timeSinceLastPurchase > 10000) {
+                        setTimeout(showSellOpportunity, 500); // Slight delay to avoid UI conflicts
+                    }
+                }
+            }
+            
+            // Update time display
+            updateTimeDisplay();
+            
+            // Process monthly cashflow for all owned properties
+            let totalCashflow = 0;
+            gameState.properties.forEach(property => {
+                totalCashflow += property.cashflow;
+            });
+            
+            gameState.money += totalCashflow;
+            updateMoneyDisplay();
+        }
+        
+        // Show sell opportunity
+        function showSellOpportunity() {
+            // Safety checks
+            if (gameState.sellOfferActive) return false;
+            if (gameState.isModalVisible) return false;
+            if (gameState.properties.length === 0) return false;
+            if (gameState.year < 4) return false;
+            
+            // Set flags to prevent multiple offers
+            gameState.sellOfferActive = true;
+            gameState.isModalVisible = true;
+            
+           // Filter properties owned for at least 36 months
+const eligibleProperties = gameState.properties
+    .map((property, index) => {
+        const monthsOwned = (gameState.year - property.purchaseDate.year) * 12 + 
+                            (gameState.month - property.purchaseDate.month);
+        return { property, index, monthsOwned };
+    })
+    .filter(item => item.monthsOwned >= 36);
+
+// If no eligible properties, exit early
+if (eligibleProperties.length === 0) {
+    gameState.sellOfferActive = false;
+    gameState.isModalVisible = false;
+    return;
+}
+
+// Randomly select one of the eligible properties
+const selected = eligibleProperties[Math.floor(Math.random() * eligibleProperties.length)];
+selectedPropertyIndex = selected.index;
+const property = selected.property;
+const monthsOwned = selected.monthsOwned;
+            
+            // Calculate a random sale price (±25% of original value)
+            const priceVariation = property.purchasePrice * 0.25;
+            const salePrice = property.purchasePrice + (Math.random() * priceVariation * 2) - priceVariation;
+            const roundedSalePrice = Math.round(salePrice / 1000) * 1000; // Round to nearest thousand
+            
+            // Calculate outstanding loan
+            const loanPaidPercentage = monthsOwned * 0.005; // 0.5% per month
+            const remainingLoanPercentage = Math.max(0, 1 - loanPaidPercentage);
+            const outstandingLoan = property.loanAmount * remainingLoanPercentage;
+            
+            // Calculate equity (sale price - outstanding loan)
+            const equity = roundedSalePrice - outstandingLoan;
+            
+            // Calculate profit/loss (equity - down payment)
+            const profitLoss = equity - property.downPayment;
+            
+            // Update modal content with property details
+            sellDescription.innerHTML = `
+                <strong>A buyer is interested in one of your properties!</strong><br><br>
+                Property details:<br>
+                <strong>Purchase Price:</strong> ${formatMoney(property.purchasePrice)}<br>
+                <strong>Tenure:</strong> ${typeof property.tenure === 'string' ? property.tenure : property.tenure + ' years'}<br>
+                <strong>Monthly Rental:</strong> ${formatMoney(property.rentalIncome)}<br>
+                <strong>Time Owned:</strong> ${monthsOwned} months<br><br>
+                <strong>Offer Details:</strong><br>
+                <strong>Original Purchase:</strong> ${formatMoney(property.purchasePrice)}<br>
+                <strong>Outstanding Loan:</strong> ${formatMoney(outstandingLoan)}<br>
+                <strong>Offered Sale Price:</strong> ${formatMoney(roundedSalePrice)}<br>
+                <strong>Your Equity:</strong> ${formatMoney(equity)}<br>
+                <strong>Profit/Loss:</strong> <span style="color:${profitLoss >= 0 ? '#32d74b' : '#ff453a'}">${(profitLoss >= 0 ? '+' : '') + formatMoney(profitLoss)}</span><br>
+            `;
+            
+            // Store values for use in accept function
+            property.salePrice = roundedSalePrice;
+            property.outstandingLoan = outstandingLoan;
+            property.equity = equity;
+            
+            // Pause the game timer
+            if (gameState.countdownInterval) {
+                clearInterval(gameState.countdownInterval);
+                gameState.countdownInterval = null;
+            }
+            
+            // Show modal
+            sellModal.style.display = 'flex';
+            
+            return true;
+        }
+        
+        // Accept sell opportunity
+        function acceptSell() {
+            if (!gameState.sellOfferActive) return;
+            if (selectedPropertyIndex === null || selectedPropertyIndex < 0 || 
+                selectedPropertyIndex >= gameState.properties.length) return;
+            
+            const property = gameState.properties[selectedPropertyIndex];
+            
+            // Add equity (sale price minus outstanding loan) to money
+            gameState.money += property.equity;
+            
+            // Remove property from owned properties
+            gameState.properties.splice(selectedPropertyIndex, 1);
+            gameState.propertiesOwned--;
+            
+            // Update displays
+            updateMoneyDisplay();
+            updatePropertiesOwnedDisplay();
+            
+            // Hide modal
+            sellModal.style.display = 'none';
+            
+            // Reset flags
+            gameState.sellOfferActive = false;
+            gameState.isModalVisible = false;
+            selectedPropertyIndex = null;
+            
+            // Resume game timer
+            resumeGameTimer();
+        }
+        
+        // Decline sell opportunity
+        function declineSell() {
+            if (!gameState.sellOfferActive) return;
+            
+            // Hide modal
+            sellModal.style.display = 'none';
+            
+            // Reset flags
+            gameState.sellOfferActive = false;
+            gameState.isModalVisible = false;
+            selectedPropertyIndex = null;
+            
+            // Resume game timer
+            resumeGameTimer();
+        }
+        
+        // Resume just the game timer
+        function resumeGameTimer() {
+            if (gameState.countdownInterval) return; // Already running
+            
+            // Start timer from where it left off
+            const percentage = (gameState.currentTimerValue / gameState.timerSeconds) * 100;
+            updateTimerBar(percentage);
+            
+            // Calculate interval based on game speed
+            const interval = 100 / gameState.gameSpeed;
+            
+            // Restart the countdown
+            gameState.countdownInterval = setInterval(() => {
+                const reductionAmount = 0.1;
+                gameState.currentTimerValue -= reductionAmount;
+                
+                const percentage = (gameState.currentTimerValue / gameState.timerSeconds) * 100;
+                updateTimerBar(percentage);
+                
+                if (gameState.currentTimerValue <= 0) {
+                    // When timer naturally expires, update month and show new property
+                    updateMonth();
+                    showNewProperty();
+                    
+                    // Reset timer only when it expires naturally
+                    gameState.currentTimerValue = gameState.timerSeconds;
+                    updateTimerBar(100);
+                }
+            }, interval);
+        }
+        
+        // Pause game timers
+        function pauseGameTimers() {
+            clearInterval(gameState.countdownInterval);
+            gameState.countdownInterval = null;
+        }
+        
+        // Resume game timers
+        function resumeGameTimers() {
+            // Only resume if not already running
+            if (gameState.countdownInterval) return;
+            
+            // Start timer from where it left off
+            const percentage = (gameState.currentTimerValue / gameState.timerSeconds) * 100;
+            updateTimerBar(percentage);
+            
+            // Calculate interval based on game speed
+            const interval = 100 / gameState.gameSpeed;
+            
+            // Restart the countdown
+            gameState.countdownInterval = setInterval(() => {
+                const reductionAmount = 0.1;
+                gameState.currentTimerValue -= reductionAmount;
+                
+                const percentage = (gameState.currentTimerValue / gameState.timerSeconds) * 100;
+                updateTimerBar(percentage);
+                
+                if (gameState.currentTimerValue <= 0) {
+                    // When timer naturally expires, update month and show new property
+                    updateMonth();
+                    showNewProperty();
+                    
+                    // Reset timer only when it expires naturally
+                    gameState.currentTimerValue = gameState.timerSeconds;
+                    updateTimerBar(100);
+                }
+            }, interval);
+            
+            // We don't restart the sell opportunity timer here - it's managed separately
+        }
+        
+        // End the game
+        function endGame() {
+            // Stop all timers
+            if (gameState.countdownInterval) {
+                clearInterval(gameState.countdownInterval);
+                gameState.countdownInterval = null;
+            }
+            
+            // Calculate final stats
+            let totalPropertyValue = 0;
+            let totalEquity = 0;
+            let totalMonthlyCashflow = 0;
+            
+            gameState.properties.forEach(property => {
+                // Calculate outstanding loan for each property
+                const monthsOwned = (gameState.year - property.purchaseDate.year) * 12 + 
+                                  (gameState.month - property.purchaseDate.month);
+                const loanPaidPercentage = monthsOwned * 0.005; // 0.5% per month
+                const remainingLoanPercentage = Math.max(0, 1 - loanPaidPercentage);
+                const outstandingLoan = property.loanAmount * remainingLoanPercentage;
+                
+                // Property value could fluctuate, but we'll use original price for simplicity
+                totalPropertyValue += property.purchasePrice;
+                
+                // Equity is property value minus outstanding loan
+                const equity = property.purchasePrice - outstandingLoan;
+                totalEquity += equity;
+                
+                // Add up all monthly cashflows
+                totalMonthlyCashflow += property.cashflow;
+            });
+            
+            // Net worth is cash plus equity in properties
+            const netWorth = gameState.money + totalEquity;
+            
+            // Update game over screen
+            finalBalanceElement.textContent = formatMoney(gameState.money);
+            finalPropertiesElement.textContent = gameState.propertiesOwned;
+            propertyValueElement.textContent = formatMoney(totalPropertyValue);
+            netWorthElement.textContent = formatMoney(netWorth);
+            finalCashflowElement.textContent = formatMoney(totalMonthlyCashflow) + '/month';
+            
+            // Color code the cashflow value
+            finalCashflowElement.style.color = totalMonthlyCashflow >= 0 ? '#32d74b' : '#ff453a';
+            
+            // Hide game container and show game over screen
+            gameContainer.style.display = 'none';
+            gameOverScreen.style.display = 'flex';
+        }
+        
+        // Toggle game speed
+        function toggleGameSpeed() {
+            // Toggle between 1x and 2x speed
+            gameState.gameSpeed = gameState.gameSpeed === 1 ? 2 : 1;
+            
+            // Update speed button text
+            speedButton.textContent = gameState.gameSpeed + 'x';
+            
+            // Toggle active class for visual feedback
+            if (gameState.gameSpeed === 2) {
+                speedButton.classList.add('active');
+            } else {
+                speedButton.classList.remove('active');
+            }
+            
+            // Only restart the timer if it's currently running
+            if (gameState.countdownInterval) {
+                // Clear existing interval
+                clearInterval(gameState.countdownInterval);
+                gameState.countdownInterval = null;
+                
+                // Restart it with new speed
+                resumeGameTimer();
+            }
+        }
+        
+        // Start the game with selected difficulty
+        function startGame(difficulty) {
+            gameState.difficulty = difficulty;
+            
+            // Set initial money based on difficulty
+            if (difficulty === 'easy') {
+                gameState.money = 500000;
+                gameState.showCashflow = true;
+            } else if (difficulty === 'normal') {
+                gameState.money = 200000;
+                gameState.showCashflow = true;
+            } else if (difficulty === 'hard') {
+                gameState.money = 200000;
+                gameState.showCashflow = false;
+            }
+            
+            // Reset game state
+            gameState.month = 1;
+            gameState.year = 1;
+            gameState.properties = [];
+            gameState.propertiesOwned = 0;
+            gameState.gameActive = true;
+            gameState.currentTimerValue = gameState.timerSeconds;
+            gameState.gameSpeed = 1; // Always start at 1x speed
+            
+            // Update speed button display
+            speedButton.textContent = gameState.gameSpeed + 'x';
+            speedButton.classList.remove('active'); // Remove active class (for 2x)
+            
+            // Update displays
+            updateMoneyDisplay();
+            updateTimeDisplay();
+            updatePropertiesOwnedDisplay();
+            
+            // Update displays
+            updateMoneyDisplay();
+            updateTimeDisplay();
+            updatePropertiesOwnedDisplay();
+            
+            // Hide start screen, show game container
+            startScreen.style.display = 'none';
+            gameContainer.style.display = 'flex';
+            gameOverScreen.style.display = 'none';
+            
+            // Show first property
+            showNewProperty();
+            
+            // Start timers
+            startCardTimer(); // Start the timer for property decisions
+            
+            // Don't start sell opportunity timer until year 4
+            // It will be started in the updateMonth function when reaching year 4
+            
+            // Add event listener for speed button
+            speedButton.addEventListener('click', toggleGameSpeed);
+        }
+        
+        // Event listeners
+        difficultyButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const difficulty = button.getAttribute('data-difficulty');
+                startGame(difficulty);
+            });
+        });
+        
+        declineButton.addEventListener('click', declineProperty);
+        purchaseButton.addEventListener('click', purchaseProperty);
+        declineSellButton.addEventListener('click', declineSell);
+        acceptSellButton.addEventListener('click', acceptSell);
+        playAgainButton.addEventListener('click', () => {
+            gameOverScreen.style.display = 'none';
+            startScreen.style.display = 'flex';
+        });
+        
+        // Glossary button logic
+const glossaryButton = document.getElementById('glossaryButton');
+const glossaryModal = document.getElementById('glossaryModal');
+const closeGlossaryButton = document.getElementById('closeGlossary');
+
+glossaryButton.addEventListener('click', () => {
+    glossaryModal.style.display = 'flex';
+});
+
+closeGlossaryButton.addEventListener('click', () => {
+    glossaryModal.style.display = 'none';
+});
+
+        
+        // Touch/swipe events for mobile
+        let startX = 0;
+        let startY = 0;
+        let isDragging = false;
+        let initialTransform = '';
+        
+        propertyCard.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+            isDragging = true;
+            initialTransform = propertyCard.style.transform || '';
+            
+            // Disable transition during drag
+            propertyCard.style.transition = 'none';
+        });
+        
+        propertyCard.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            
+            const currentX = e.touches[0].clientX;
+            const currentY = e.touches[0].clientY;
+            const diffX = currentX - startX;
+            const diffY = currentY - startY;
+            
+            // Add some rotation based on horizontal movement
+            const rotation = diffX * 0.1; // Adjust for rotation sensitivity
+            
+            // Update transform
+            propertyCard.style.transform = `translateX(${diffX}px) translateY(${diffY}px) rotate(${rotation}deg)`;
+            
+            // Change opacity based on distance (fading out as it moves away)
+            const distance = Math.abs(diffX);
+            const opacity = Math.max(1 - distance / 200, 0.5); // Min opacity of 0.5
+            propertyCard.style.opacity = opacity.toString();
+            
+            // Add visual cue for purchase (green) or decline (red)
+            if (diffX > 50) {
+                propertyCard.style.boxShadow = '0 8px 30px rgba(50, 215, 75, 0.5)'; // Green glow for purchase
+            } else if (diffX < -50) {
+                propertyCard.style.boxShadow = '0 8px 30px rgba(255, 69, 58, 0.5)'; // Red glow for decline
+            } else {
+                propertyCard.style.boxShadow = '0 8px 30px rgba(0, 0, 0, 0.08)'; // Default shadow
+            }
+        });
+        
+        propertyCard.addEventListener('touchend', (e) => {
+            if (!isDragging) return;
+            
+            const diffX = e.changedTouches[0].clientX - startX;
+            
+            // Re-enable transitions
+            propertyCard.style.transition = 'transform 0.3s ease, opacity 0.3s ease, box-shadow 0.3s ease';
+            
+            // Reset shadow
+            propertyCard.style.boxShadow = '0 8px 30px rgba(0, 0, 0, 0.08)';
+            
+            // If significant horizontal swipe, trigger purchase or decline
+            if (diffX > 100) {
+                // Swipe right (purchase)
+                purchaseProperty();
+            } else if (diffX < -100) {
+                // Swipe left (decline)
+                declineProperty();
+            } else {
+                // Reset to original position if no significant swipe
+                propertyCard.style.transform = initialTransform;
+                propertyCard.style.opacity = '1';
+            }
+            
+            isDragging = false;
+            startX = 0;
+            startY = 0;
+        });
+        
+        // Add similar behavior for mouse events on desktop
+        propertyCard.addEventListener('mousedown', (e) => {
+            startX = e.clientX;
+            startY = e.clientY;
+            isDragging = true;
+            initialTransform = propertyCard.style.transform || '';
+            
+            // Disable transition during drag
+            propertyCard.style.transition = 'none';
+            
+            // Prevent default to avoid text selection during drag
+            e.preventDefault();
+        });
+        
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            
+            const diffX = e.clientX - startX;
+            const diffY = e.clientY - startY;
+            
+            // Add some rotation based on horizontal movement
+            const rotation = diffX * 0.1; // Adjust for rotation sensitivity
+            
+            // Update transform
+            propertyCard.style.transform = `translateX(${diffX}px) translateY(${diffY}px) rotate(${rotation}deg)`;
+            
+            // Change opacity based on distance (fading out as it moves away)
+            const distance = Math.abs(diffX);
+            const opacity = Math.max(1 - distance / 200, 0.5); // Min opacity of 0.5
+            propertyCard.style.opacity = opacity.toString();
+            
+            // Add visual cue for purchase (green) or decline (red)
+            if (diffX > 50) {
+                propertyCard.style.boxShadow = '0 8px 30px rgba(50, 215, 75, 0.5)'; // Green glow for purchase
+            } else if (diffX < -50) {
+                propertyCard.style.boxShadow = '0 8px 30px rgba(255, 69, 58, 0.5)'; // Red glow for decline
+            } else {
+                propertyCard.style.boxShadow = '0 8px 30px rgba(0, 0, 0, 0.08)'; // Default shadow
+            }
+        });
+        
+        document.addEventListener('mouseup', (e) => {
+            if (!isDragging) return;
+            
+            const diffX = e.clientX - startX;
+            
+            // Re-enable transitions
+            propertyCard.style.transition = 'transform 0.3s ease, opacity 0.3s ease, box-shadow 0.3s ease';
+            
+            // Reset shadow
+            propertyCard.style.boxShadow = '0 8px 30px rgba(0, 0, 0, 0.08)';
+            
+            // If significant horizontal swipe, trigger purchase or decline
+            if (diffX > 100) {
+                // Swipe right (purchase)
+                purchaseProperty();
+            } else if (diffX < -100) {
+                // Swipe left (decline)
+                declineProperty();
+            } else {
+                // Reset to original position if no significant swipe
+                propertyCard.style.transform = initialTransform;
+                propertyCard.style.opacity = '1';
+            }
+            
+            isDragging = false;
+            startX = 0;
+            startY = 0;
+        });
+    </script>
+</body>
+</html>
